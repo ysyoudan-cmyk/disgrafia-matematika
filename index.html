@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Deteksi Dini Disgrafia Matematika</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for downloading summary as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        soft: {
+                            50: '#f5f0ff',
+                            100: '#ebe0ff',
+                            200: '#d7c1ff',
+                            300: '#b48aff',
+                            400: '#9b5cff',
+                            500: '#8033ff',
+                            600: '#6c1fe0',
+                            700: '#5a19b8',
+                        },
+                        tealsoft: {
+                            50: '#e3fff9',
+                            100: '#b8ffef',
+                            500: '#00c9a7',
+                            600: '#00a888',
+                        },
+                        ambersoft: {
+                            50: '#fff9e0',
+                            100: '#ffedb0',
+                            500: '#ffb400',
+                            600: '#f08c00',
+                        },
+                        rosesoft: {
+                            50: '#ffe9f2',
+                            100: '#ffc6df',
+                            500: '#ff4b91',
+                            600: '#f01a70',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #334155;
+            background: linear-gradient(120deg, #d9fdf3 0%, #eae0ff 22%, #fff3c9 45%, #ffe0ec 68%, #dcf3ff 88%, #d9fdf3 100%);
+            background-size: 300% 300%;
+            animation: gradientFlow 20s ease infinite;
+            min-height: 100vh;
+        }
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @media print {
+            body { animation: none !important; }
+        }
+        /* Watermark pengembang */
+        .dev-watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 14px;
+            z-index: 40;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            color: rgba(90, 25, 184, 0.6);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            border: 1px solid rgba(128, 51, 255, 0.25);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+        }
+        @media print {
+            .dev-watermark {
+                display: none !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .dev-watermark {
+                font-size: 9px;
+                padding: 3px 8px;
+                right: 8px;
+                bottom: 8px;
+            }
+        }
+        /* Blob dekorasi warna-warni di latar belakang */
+        .bg-blob {
+            position: fixed;
+            border-radius: 9999px;
+            filter: blur(65px);
+            z-index: -1;
+            opacity: 0.45;
+            pointer-events: none;
+            animation: blobFloat 14s ease-in-out infinite;
+        }
+        .bg-blob-1 { top: -90px; left: -70px; width: 360px; height: 360px; background: #8033ff; opacity: 0.5; animation-delay: 0s; }
+        .bg-blob-2 { top: 38%; right: -110px; width: 400px; height: 400px; background: #00d9b0; opacity: 0.4; animation-delay: -4s; }
+        .bg-blob-3 { bottom: -110px; left: 18%; width: 420px; height: 420px; background: #ffb400; opacity: 0.38; animation-delay: -8s; }
+        .bg-blob-4 { bottom: 8%; right: 12%; width: 280px; height: 280px; background: #ff4b91; opacity: 0.38; animation-delay: -2s; }
+        @keyframes blobFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(18px, -22px) scale(1.06); }
+        }
+        @media print {
+            .bg-blob { display: none !important; }
+        }
+        /* Karakter maskot */
+        .mascot {
+            animation: mascot-float 3.2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(105, 41, 210, 0.2));
+        }
+        @keyframes mascot-float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .mascot-badge {
+            animation: mascot-pop 0.6s ease-out;
+        }
+        @keyframes mascot-pop {
+            0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+            70% { transform: scale(1.08) rotate(3deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .soft-card {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #e9e3fb;
+            box-shadow: 0 10px 25px -5px rgba(128, 51, 255, 0.12), 0 8px 10px -6px rgba(0, 201, 167, 0.08);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .soft-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8033ff, #00c9a7, #ffb400, #ff4b91);
+            background-size: 200% 100%;
+            animation: cardStripe 6s linear infinite;
+        }
+        @keyframes cardStripe {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .soft-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px -8px rgba(128, 51, 255, 0.18), 0 10px 14px -8px rgba(0, 201, 167, 0.12);
+        }
+        @media print {
+            .soft-card::before { display: none !important; animation: none !important; }
+            .soft-card:hover { transform: none; }
+        }
+        .soft-input {
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.75rem;
+        }
+        .soft-input:focus {
+            border-color: #8033ff;
+            box-shadow: 0 0 0 4px rgba(128, 51, 255, 0.15);
+            outline: none;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white;
+            }
+            .soft-card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-soft-200">
+
+    <!-- Watermark Pengembang -->
+    <div class="dev-watermark no-print">dikembangkan oleh Sandy Ihsan Amarulloh, M.Pd.</div>
+
+    <!-- Dekorasi Blob Warna-warni -->
+    <div class="bg-blob bg-blob-1 no-print"></div>
+    <div class="bg-blob bg-blob-2 no-print"></div>
+    <div class="bg-blob bg-blob-3 no-print"></div>
+    <div class="bg-blob bg-blob-4 no-print"></div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 no-print" style="border-bottom-width: 3px; border-image: linear-gradient(90deg, #8033ff, #00c9a7, #ffb400, #ff4b91) 1;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goToStep('login')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-soft-500 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-soft-300">
+                    <i class="fa-solid fa-brain-circuit text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-lg leading-tight">DysMath<span class="text-soft-600">Detect</span></h1>
+                    <p class="text-xs text-slate-400">Deteksi Dini Disgrafia Matematika</p>
+                </div>
+            </div>
+
+            <div id="nav-steps" class="hidden md:flex items-center space-x-2 text-xs font-medium text-slate-500">
+                <button onclick="checkAndGo('soal')" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-slate-100" id="nav-soal">
+                    <i class="fa-solid fa-file-pen mr-1"></i> 1. Instrumen Soal
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button onclick="checkAndGo('petunjuk')" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-slate-100" id="nav-petunjuk">
+                    <i class="fa-solid fa-book-open mr-1"></i> 2. Petunjuk
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button onclick="checkAndGo('observasi')" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-slate-100" id="nav-observasi">
+                    <i class="fa-solid fa-clipboard-check mr-1"></i> 3. Lembar Observasi
+                </button>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                <button onclick="checkAndGo('hasil')" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-slate-100" id="nav-hasil">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> 4. Hasil Rekap
+                </button>
+            </div>
+
+            <div id="user-badge" class="hidden items-center space-x-2 bg-soft-50 border border-soft-200 px-3 py-1 rounded-full text-xs font-medium text-soft-700">
+                <i class="fa-solid fa-user-circle"></i>
+                <span id="badge-nama">Siswa</span>
+                <span id="badge-kelas" class="bg-soft-200 text-soft-800 px-1.5 py-0.5 rounded-md text-[10px]">Kelas -</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- STEP 0: LOGIN & DATA SISWA -->
+        <section id="step-login" class="max-w-xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <svg class="mascot mx-auto w-24 h-24" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#6c1fe0" opacity="0.14"/>
+                    <circle cx="60" cy="58" r="42" fill="#9b5cff"/>
+                    <circle cx="60" cy="58" r="42" fill="url(#mascotGrad)"/>
+                    <defs>
+                        <linearGradient id="mascotGrad" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#8033ff"/>
+                            <stop offset="55%" stop-color="#ff4b91"/>
+                            <stop offset="100%" stop-color="#00c9a7"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="43" cy="52" r="8" fill="#ffffff"/>
+                    <circle cx="77" cy="52" r="8" fill="#ffffff"/>
+                    <circle cx="44" cy="53" r="4" fill="#1e293b"/>
+                    <circle cx="78" cy="53" r="4" fill="#1e293b"/>
+                    <circle cx="34" cy="66" r="6" fill="#ff4b91" opacity="0.4"/>
+                    <circle cx="86" cy="66" r="6" fill="#ff4b91" opacity="0.4"/>
+                    <path d="M46 72 Q60 84 74 72" stroke="#1e293b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                    <rect x="50" y="10" width="20" height="16" rx="6" fill="#ffb400"/>
+                    <circle cx="60" cy="10" r="6" fill="#ffd93d"/>
+                    <path d="M18 60 Q4 58 8 44" stroke="#8033ff" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    <path d="M102 60 Q116 52 110 38" stroke="#00c9a7" stroke-width="6" fill="none" stroke-linecap="round"/>
+                </svg>
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-soft-500 to-tealsoft-500 text-white rounded-2xl mb-2 shadow-lg shadow-soft-200">
+                    <i class="fa-solid fa-user-graduate text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Registrasi Assesmen Siswa</h2>
+                <p class="text-sm text-slate-500">Masukkan identitas peserta didik dan penilai untuk memulai proses deteksi dini disgrafia matematika.</p>
+            </div>
+
+            <div class="soft-card p-6 md:p-8 space-y-5">
+                <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nama Lengkap Siswa <span class="text-rose-500">*</span></label>
+                        <input type="text" id="input-nama" required placeholder="Contoh: Ananda Rizky Pratama" class="w-full px-4 py-2.5 text-sm soft-input">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Jenjang Pendidikan <span class="text-rose-500">*</span></label>
+                            <select id="input-jenjang" required class="w-full px-4 py-2.5 text-sm soft-input bg-white">
+                                <option value="">Pilih Jenjang</option>
+                                <option value="SD / MI">SD / MI</option>
+                                <option value="SMP / MTs">SMP / MTs</option>
+                                <option value="Lainnya">Lainnya / Sederajat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Kelas <span class="text-rose-500">*</span></label>
+                            <input type="text" id="input-kelas" required placeholder="Contoh: 3A / IV" class="w-full px-4 py-2.5 text-sm soft-input">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                            <select id="input-jk" required class="w-full px-4 py-2.5 text-sm soft-input bg-white">
+                                <option value="">Pilih Jenis Kelamin</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Tanggal Observasi <span class="text-rose-500">*</span></label>
+                            <input type="date" id="input-tanggal" required class="w-full px-4 py-2.5 text-sm soft-input bg-white">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nama Pengamat / Guru / Orang Tua</label>
+                        <input type="text" id="input-pengamat" placeholder="Contoh: Ibu Rahmawati, S.Pd." class="w-full px-4 py-2.5 text-sm soft-input">
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-6 bg-soft-600 hover:bg-soft-700 text-white font-medium rounded-xl shadow-lg shadow-soft-200 transition-all flex items-center justify-center space-x-2">
+                        <span>Mulai Asesmen & Buka Lembar Soal</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- STEP 1: INSTRUMEN SOAL (15 SOAL) -->
+        <section id="step-soal" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <span class="px-2.5 py-1 rounded-md bg-gradient-to-r from-soft-500 to-indigo-500 text-white font-semibold text-xs uppercase tracking-wider shadow-sm">Langkah 1 dari 4</span>
+                    <h2 class="text-xl font-bold text-slate-800 mt-1">Instrumen Soal Deteksi Dini Disgrafia Matematika</h2>
+                    <p class="text-xs text-slate-500">Berikan 15 soal ini kepada siswa untuk dikerjakan di lembar/buku tulis. Amati proses pengerjaannya.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="downloadSoalPDF()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium rounded-xl shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Cetak / Download Lembar Soal</span>
+                    </button>
+                    <button onclick="goToStep('petunjuk')" class="px-4 py-2 bg-soft-600 hover:bg-soft-700 text-white text-xs font-medium rounded-xl shadow transition flex items-center space-x-1.5">
+                        <span>Lanjut ke Petunjuk Observasi</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Print Header only for printable view -->
+            <div id="printable-soal-header" class="hidden print-only mb-6 border-b pb-4">
+                <div class="text-center font-bold text-lg uppercase">INSTRUMEN SOAL DETEKSI DINI DISGRAFIA MATEMATIKA</div>
+                <div class="grid grid-cols-2 text-xs mt-4 gap-2">
+                    <div><strong>Nama Siswa:</strong> <span class="print-nama">...</span></div>
+                    <div><strong>Kelas / Jenjang:</strong> <span class="print-kelas">...</span></div>
+                    <div><strong>Jenis Kelamin:</strong> <span class="print-jk">...</span></div>
+                    <div><strong>Tanggal:</strong> <span class="print-tanggal">...</span></div>
+                </div>
+                <p class="text-xs italic mt-2 text-slate-600">Petunjuk Pengerjaan: Kerjakan soal-soal berikut pada buku tulis atau lembar jawaban secara mandiri dan rapi.</p>
+            </div>
+
+            <!-- List Soal Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Soal Item 1 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-soft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-soft-100 text-soft-700 flex items-center justify-center font-bold text-xs">1</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Motorik Halus</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Tuliskan dan selesaikan perhitungan berikut:</p>
+                    <div class="p-3 bg-slate-50 rounded-lg text-center font-mono font-bold text-slate-700 text-base tracking-wider">
+                        604 – 278 = .......
+                    </div>
+                    <p class="text-xs text-slate-400 italic">Aspek: Koordinasi otot tangan & kerapian ukuran angka.</p>
+                </div>
+
+                <!-- Soal Item 2 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-soft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-soft-100 text-soft-700 flex items-center justify-center font-bold text-xs">2</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Motorik Halus</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Tuliskan dan selesaikan perhitungan berikut di buku tulis dengan angka yang rapi dan sejajar:</p>
+                    <div class="p-3 bg-slate-50 rounded-lg text-center font-mono font-bold text-slate-700 text-base tracking-wider">
+                        482 + 356 + 274 = .......
+                    </div>
+                    <p class="text-xs text-slate-400 italic">Aspek: Kontrol alignment / kerapian lajur matematika.</p>
+                </div>
+
+                <!-- Soal Item 3 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-soft-500 md:col-span-2">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-soft-100 text-soft-700 flex items-center justify-center font-bold text-xs">3</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Visual Tracking & Salin</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Guru/Pengamat menulis soal berikut di papan tulis. Siswa diminta menyalin ke buku tulis lalu menyelesaikannya:</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 font-mono text-xs font-semibold text-center text-slate-700">
+                        <div class="p-2 bg-slate-50 rounded border">124 + 236 + 345</div>
+                        <div class="p-2 bg-slate-50 rounded border">456 – 278</div>
+                        <div class="p-2 bg-slate-50 rounded border">34 × 27</div>
+                        <div class="p-2 bg-slate-50 rounded border">368 + 145 + 219</div>
+                        <div class="p-2 bg-slate-50 rounded border">512 – 384</div>
+                    </div>
+                    <p class="text-xs text-slate-400 italic">Pengamatan: Amati kecepatan menyalin, ketepatan salinan, dan tanda-tanda kelelahan tangan.</p>
+                </div>
+
+                <!-- Soal Item 4 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-tealsoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-tealsoft-100 text-tealsoft-600 flex items-center justify-center font-bold text-xs">4</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Orientasi Spasial</span>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-800">Tuliskan jawabanmu secara vertikal (susun bawah) di buku tulis!</p>
+                    <div class="p-3 bg-slate-50 rounded-lg text-center font-mono font-bold text-slate-700 text-base tracking-wider">
+                        452 + 368 = .......
+                    </div>
+                    <p class="text-xs text-slate-400 italic">Aspek: Penataan kolom nilai tempat (satuan, puluhan, ratusan).</p>
+                </div>
+
+                <!-- Soal Item 5 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-tealsoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-tealsoft-100 text-tealsoft-600 flex items-center justify-center font-bold text-xs">5</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Soal Cerita / Eksekusi</span>
+                    </div>
+                    <p class="text-sm font-normal text-slate-700">Di sebuah kebun terdapat <strong>37 pohon mangga</strong>, <strong>73 pohon jambu</strong>, dan <strong>57 pohon jeruk</strong>. Hitunglah jumlah seluruh pohon buah di kebun tersebut. Tuliskan perhitunganmu secara vertikal dan rapi di buku tulis!</p>
+                    <p class="text-xs text-slate-400 italic">Aspek: Kemampuan penterjemahan konsep cerita ke bentuk susun vertikal.</p>
+                </div>
+
+                <!-- Soal Item 6 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-ambersoft-500 md:col-span-2">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-ambersoft-100 text-ambersoft-600 flex items-center justify-center font-bold text-xs">6</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Transfer Visual ke Tulisan</span>
+                    </div>
+                    <p class="text-xs font-semibold text-amber-700">Soal ditampilkan / ditulis di papan tulis lengkap:</p>
+                    <p class="text-sm text-slate-700 italic bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                        "Seorang pedagang memiliki 125 apel, 86 jeruk, dan 74 mangga. Semua buah tersebut ingin dimasukkan ke dalam keranjang, setiap keranjang berisi 5 buah. Berapa keranjang yang diperlukan untuk semua buah?"
+                    </p>
+                    <p class="text-xs text-slate-400 italic">Pengamatan: Amati akurasi menyalin angka dan penataan langkah pembagian.</p>
+                </div>
+
+                <!-- Soal Item 7 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-tealsoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-tealsoft-100 text-tealsoft-600 flex items-center justify-center font-bold text-xs">7</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Bentuk Angka Mirip</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Di sebuah toko mainan terdapat <strong>69 mobil-mobilan</strong>, <strong>96 boneka</strong>, dan <strong>66 bola</strong>. Hitunglah jumlah seluruh mainan yang ada di toko tersebut, lalu tuliskan perhitunganmu dengan jelas dan rapi di buku tulis!</p>
+                    <p class="text-xs text-slate-400 italic">Aspek: Membedakan angka mirip (6 vs 9).</p>
+                </div>
+
+                <!-- Soal Item 8 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-indigo-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">8</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Beban Kognitif & Pengurangan</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Pada pagi hari, sebuah toko roti membuat <strong>236 roti</strong>. Siang harinya, sebanyak <strong>125 roti</strong> telah terjual. Hitunglah berapa sisa roti yang masih ada. Tuliskan perhitungan penguranganmu dengan jelas dan rapi!</p>
+                </div>
+
+                <!-- Soal Item 9 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-tealsoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-tealsoft-100 text-tealsoft-600 flex items-center justify-center font-bold text-xs">9</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Orientasi & Pembagian</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Dina memiliki <strong>24 kelereng</strong>. Ia ingin membagikan kelereng tersebut kepada <strong>4 orang teman</strong> secara adil. Hitunglah berapa kelereng yang diterima setiap teman. Tuliskan perhitunganmu di buku tulis!</p>
+                </div>
+
+                <!-- Soal Item 10 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-ambersoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-ambersoft-100 text-ambersoft-600 flex items-center justify-center font-bold text-xs">10</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Visual Tracking</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Ibu membeli <strong>128 permen</strong>. Permen tersebut akan dibagi ke dalam <strong>8 toples</strong> dengan jumlah yang sama. Hitunglah berapa permen di masing-masing toples secara rapi!</p>
+                </div>
+
+                <!-- Soal Item 11 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-indigo-500 md:col-span-2">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">11</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Memori Kerja & Kompleksitas</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Seorang pedagang buah memiliki <strong>135 apel</strong>, <strong>248 jeruk</strong>, dan <strong>167 mangga</strong>. Semua buah dimasukkan ke kantong plastik (masing-masing 10 buah). Hitung berapa kantong plastik yang dibutuhkan untuk masing-masing jenis buah, lalu hitung total seluruh kantong yang diperlukan!</p>
+                </div>
+
+                <!-- Soal Item 12 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-indigo-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">12</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Urutan Logis & Spasial</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Di perpustakaan terdapat <strong>124 buku cerita</strong>, <strong>132 buku pelajaran</strong>, dan <strong>143 buku ensiklopedia</strong>. Tuliskan urutan jenis buku dari jumlah yang paling sedikit hingga paling banyak!</p>
+                </div>
+
+                <!-- Soal Item 13 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-rosesoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-rosesoft-100 text-rosesoft-600 flex items-center justify-center font-bold text-xs">13</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Persepsi Angka</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Siti membeli 2 pensil (Rp4.000/pensil), 1 buku tulis (Rp7.000), dan 1 penghapus (Rp3.000). Hitung total uang yang harus dibayar Siti di buku tulis!</p>
+                </div>
+
+                <!-- Soal Item 14 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-rosesoft-500">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-rosesoft-100 text-rosesoft-600 flex items-center justify-center font-bold text-xs">14</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Strategi Penghindaran</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Andi memiliki 36 kue untuk dibagikan kepada 6 teman sama banyak. Tuliskan langkah-langkah tertulis jawabanmu!</p>
+                </div>
+
+                <!-- Soal Item 15 -->
+                <div class="soft-card p-5 space-y-2 border-l-4 border-rosesoft-500 md:col-span-2">
+                    <div class="flex justify-between items-start">
+                        <span class="w-7 h-7 rounded-lg bg-rosesoft-100 text-rosesoft-600 flex items-center justify-center font-bold text-xs">15</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Keterbacaan Hasil Akhir</span>
+                    </div>
+                    <p class="text-sm text-slate-700">Di kebun ada beberapa pohon buah: Pohon mangga, 47 pohon jambu, dan 36 pohon jeruk. Berapa jumlah semua pohon buah di kebun itu? Tuliskan perhitunganmu di buku tulis!</p>
+                </div>
+            </div>
+
+            <!-- Fitur Upload File PDF Lembar Jawaban Siswa -->
+            <div class="soft-card p-6 bg-slate-50/80 border-2 border-dashed border-soft-300 rounded-2xl space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-file-pdf text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Upload File PDF Lembar Jawaban Siswa</h3>
+                        <p class="text-xs text-slate-500">Unggah berkas PDF hasil pengerjaan/scan jawaban siswa untuk didokumentasikan dalam rekap hasil diagnosa.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <label class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 hover:border-soft-500 hover:bg-soft-50 text-slate-700 text-xs font-semibold rounded-xl cursor-pointer transition shadow-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-rose-500"></i>
+                        <span>Pilih File PDF Jawaban</span>
+                        <input type="file" id="input-pdf-jawaban" accept="application/pdf,.pdf" onchange="handlePdfUpload(event)" class="hidden">
+                    </label>
+                    <button id="btn-remove-pdf" onclick="removePdfUpload()" class="hidden text-xs text-rose-600 hover:underline font-medium">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Hapus File PDF
+                    </button>
+                </div>
+
+                <!-- Preview Box Document PDF Jawaban -->
+                <div id="container-preview-pdf" class="hidden pt-2">
+                    <p class="text-[11px] font-semibold text-slate-600 mb-2">Dokumen PDF Terlampir:</p>
+                    <div class="max-w-md bg-white p-3 border border-slate-200 rounded-xl shadow-sm flex items-center justify-between">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-file-pdf text-xl"></i>
+                            </div>
+                            <div class="truncate">
+                                <p id="pdf-file-name" class="text-xs font-bold text-slate-800 truncate">dokumen.pdf</p>
+                                <p id="pdf-file-size" class="text-[10px] text-slate-400">0 KB</p>
+                            </div>
+                        </div>
+                        <button onclick="viewUploadedPdf()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-medium rounded-lg transition flex items-center space-x-1 flex-shrink-0">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Buka PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="goToStep('petunjuk')" class="px-6 py-3 bg-soft-600 hover:bg-soft-700 text-white font-medium rounded-xl shadow-md transition flex items-center space-x-2">
+                    <span>Lanjut Ke Petunjuk Observasi</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 2: PETUNJUK OBSERVASI -->
+        <section id="step-petunjuk" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <span class="px-2.5 py-1 rounded-md bg-gradient-to-r from-ambersoft-500 to-amber-400 text-white font-semibold text-xs uppercase tracking-wider shadow-sm">Langkah 2 dari 4</span>
+                    <h2 class="text-xl font-bold text-slate-800 mt-1">Petunjuk Observasi & Kriteria Penilaian</h2>
+                    <p class="text-xs text-slate-500">Pahami panduan skala skor observasi sebelum mengisi lembar pengamatan disgrafia matematika.</p>
+                </div>
+                <div>
+                    <button onclick="goToStep('observasi')" class="px-4 py-2 bg-soft-600 hover:bg-soft-700 text-white text-xs font-medium rounded-xl shadow transition flex items-center space-x-1.5">
+                        <span>Lanjut ke Lembar Observasi</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="soft-card p-6 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check text-soft-600"></i>
+                        <span>Skala Penilaian Observasi (Frekuensi)</span>
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start space-x-3">
+                            <span class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded font-bold">Skor 1</span>
+                            <div>
+                                <strong class="text-slate-800 block">Tidak Pernah (0%)</strong>
+                                <span class="text-slate-500">Siswa tidak menunjukkan hambatan sama sekali pada indikator terkait.</span>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 flex items-start space-x-3">
+                            <span class="px-2 py-0.5 bg-amber-200 text-amber-800 rounded font-bold">Skor 2</span>
+                            <div>
+                                <strong class="text-amber-900 block">Jarang (1 - 33%)</strong>
+                                <span class="text-slate-600">Hambatan hanya sesekali muncul saat kelelahan atau soal terlalu panjang.</span>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-soft-50 rounded-xl border border-soft-200 flex items-start space-x-3">
+                            <span class="px-2 py-0.5 bg-soft-200 text-soft-800 rounded font-bold">Skor 3</span>
+                            <div>
+                                <strong class="text-soft-900 block">Sering (34 - 66%)</strong>
+                                <span class="text-slate-600">Hambatan muncul secara konsisten pada lebih dari sepertiga pengerjaan soal.</span>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-200 flex items-start space-x-3">
+                            <span class="px-2 py-0.5 bg-rose-200 text-rose-800 rounded font-bold">Skor 4</span>
+                            <div>
+                                <strong class="text-rose-900 block">Selalu (> 66%)</strong>
+                                <span class="text-slate-600">Hambatan terjadi di hampir setiap nomor pengerjaan dan sangat mengganggu.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soft-card p-6 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-shapes text-soft-600"></i>
+                        <span>4 Aspek Utama Pengamatan</span>
+                    </h3>
+                    <ul class="space-y-3 text-xs text-slate-600">
+                        <li class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <strong class="text-slate-800">1. Motorik Halus & Tulisan Tangan:</strong> Mengamati kontrol jemari, keseragaman ukuran angka, dan tanda-tanda kelelahan fisik saat menulis.
+                        </li>
+                        <li class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <strong class="text-slate-800">2. Orientasi Spasial & Persepsi Visual:</strong> Mengamati penulisan angka terbalik (mirror writing), persepsi arah, dan alignment lajur kolom angka.
+                        </li>
+                        <li class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <strong class="text-slate-800">3. Proses Kognitif Dalam Menulis:</strong> Mengamati transfer visual dari papan/soal, ketepatan urutan angka, serta eksekusi langkah hitung.
+                        </li>
+                        <li class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <strong class="text-slate-800">4. Persepsi Diri & Pengalaman Subjek:</strong> Mengamati respon emosional siswa, kecenderungan memilih jawaban lisan, dan persepsi terhadap angka.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="goToStep('soal')" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 font-medium rounded-xl transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Soal
+                </button>
+                <button onclick="goToStep('observasi')" class="px-6 py-3 bg-soft-600 hover:bg-soft-700 text-white font-medium rounded-xl shadow-md transition flex items-center space-x-2">
+                    <span>Lanjut Ke Lembar Observasi</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 3: LEMBAR OBSERVASI PENGAMATAN -->
+        <section id="step-observasi" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <span class="px-2.5 py-1 rounded-md bg-gradient-to-r from-tealsoft-500 to-teal-400 text-white font-semibold text-xs uppercase tracking-wider shadow-sm">Langkah 3 dari 4</span>
+                    <h2 class="text-xl font-bold text-slate-800 mt-1">Lembar Observasi Pengamatan Deteksi Disgrafia</h2>
+                    <p class="text-xs text-slate-500">Centang skor (1-4) untuk setiap butir pengamatan sesuai dengan fakta hasil pengerjaan siswa.</p>
+                </div>
+                <div class="bg-soft-50 border border-soft-200 px-4 py-2 rounded-xl text-right">
+                    <div class="text-[10px] text-slate-500 uppercase font-bold">Skor Terisi / Total</div>
+                    <div class="text-lg font-extrabold text-soft-700"><span id="obs-filled-count">0</span> / 15</div>
+                </div>
+            </div>
+
+            <!-- Table Observasi -->
+            <div class="soft-card overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead class="bg-slate-50 text-slate-600 uppercase tracking-wider font-semibold border-b">
+                            <tr>
+                                <th class="p-3 text-center w-12">No</th>
+                                <th class="p-3">Pernyataan Observasi & Indikator Kriteria</th>
+                                <th class="p-3 text-center w-16">Skor 1<br><span class="text-[9px] font-normal lowercase">(Tdk Pernah)</span></th>
+                                <th class="p-3 text-center w-16">Skor 2<br><span class="text-[9px] font-normal lowercase">(Jarang)</span></th>
+                                <th class="p-3 text-center w-16">Skor 3<br><span class="text-[9px] font-normal lowercase">(Sering)</span></th>
+                                <th class="p-3 text-center w-16">Skor 4<br><span class="text-[9px] font-normal lowercase">(Selalu)</span></th>
+                                <th class="p-3 w-48">Catatan Pengamat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="obs-table-body" class="divide-y divide-slate-100">
+                            <!-- Dynamic rendering via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+                <button onclick="goToStep('petunjuk')" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 font-medium rounded-xl transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Petunjuk
+                </button>
+                <button onclick="processDiagnosis()" class="px-8 py-3 bg-soft-600 hover:bg-soft-700 text-white font-semibold rounded-xl shadow-lg shadow-soft-200 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Proses & Lihat Hasil Diagnosa</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 4: HASIL DIAGNOSA & REKAPITULASI -->
+        <section id="step-hasil" class="hidden space-y-6">
+
+            <!-- Action bar top -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
+                <div class="flex items-center space-x-3 text-slate-700 text-sm font-semibold">
+                    <svg class="mascot-badge w-10 h-10 flex-shrink-0" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="60" cy="60" r="46" fill="url(#mascotGradHasil)"/>
+                        <defs>
+                            <linearGradient id="mascotGradHasil" x1="14" y1="14" x2="106" y2="106" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#ffb400"/>
+                                <stop offset="55%" stop-color="#ff4b91"/>
+                                <stop offset="100%" stop-color="#8033ff"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="43" cy="54" r="8" fill="#ffffff"/>
+                        <circle cx="77" cy="54" r="8" fill="#ffffff"/>
+                        <circle cx="44" cy="55" r="4" fill="#1e293b"/>
+                        <circle cx="78" cy="55" r="4" fill="#1e293b"/>
+                        <path d="M42 72 Q60 90 78 72" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path d="M60 8 L64 18 L75 18 L66 25 L69 36 L60 29 L51 36 L54 25 L45 18 L56 18 Z" fill="#ffd93d"/>
+                    </svg>
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
+                    <span>Diagnosa Selesai Dihitung</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="downloadAsImage()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-image"></i>
+                        <span>Download Hasil (Gambar PNG)</span>
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak Laporan</span>
+                    </button>
+                    <button onclick="goToStep('observasi')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-xl transition">
+                        <i class="fa-solid fa-pen"></i> Edit Observasi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exportable Card Area -->
+            <div id="rekap-card-export" class="soft-card p-6 md:p-8 space-y-8 bg-white">
+                
+                <!-- Report Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-6 gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rosesoft-500 to-ambersoft-500 text-white flex items-center justify-center font-bold text-xl shadow">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">REKAPITULASI HASIL DETEKSI DINI DISGRAFIA MATEMATIKA</h2>
+                            <p class="text-xs text-slate-500">Instrumen Asesmen Psikopedagosis Berbasis Frekuensi Observasi Grafomotorik</p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500 text-right">
+                        <div>Tanggal Asesmen: <span id="res-tanggal" class="font-semibold text-slate-700">-</span></div>
+                        <div>Pengamat: <span id="res-pengamat" class="font-semibold text-slate-700">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Identity Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Nama Siswa</span>
+                        <span id="res-nama" class="font-bold text-slate-800 text-sm">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Jenjang / Kelas</span>
+                        <span id="res-jenjang-kelas" class="font-bold text-slate-800 text-sm">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Jenis Kelamin</span>
+                        <span id="res-jk" class="font-bold text-slate-800 text-sm">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Total Skor / Maks</span>
+                        <span id="res-score-number" class="font-bold text-soft-700 text-sm">0 / 60</span>
+                    </div>
+                </div>
+
+                <!-- Main Diagnosis Highlight -->
+                <div id="res-badge-box" class="p-6 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-2 text-center md:text-left">
+                        <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Kategori Diagnosis Tingkat Risiko</div>
+                        <div id="res-kategori-title" class="text-2xl md:text-3xl font-extrabold">Risiko Sedang</div>
+                        <p id="res-kategori-desc" class="text-xs leading-relaxed max-w-2xl text-slate-600">...</p>
+                    </div>
+                    <div class="flex-shrink-0 text-center bg-white/80 backdrop-blur px-6 py-4 rounded-xl border border-slate-200">
+                        <div id="res-percent" class="text-3xl font-black text-slate-800">0%</div>
+                        <div class="text-[10px] uppercase font-semibold text-slate-400">Persentase Hambatan</div>
+                    </div>
+                </div>
+
+                <!-- Breakdown 4 Aspek -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-chart-simple text-soft-600"></i>
+                        <span>Rincian Skor Per 4 Aspek Utama</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Aspek 1 -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>1. Motorik Halus & Tulisan Tangan</span>
+                                <span id="asp-1-score">0 / 16</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div id="asp-1-bar" class="bg-soft-500 h-full w-0 transition-all duration-500"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Mengukur kontrol otot, keseragaman ukuran angka, dan kelelahan menyalin.</p>
+                        </div>
+
+                        <!-- Aspek 2 -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>2. Orientasi Spasial & Persepsi Visual</span>
+                                <span id="asp-2-score">0 / 16</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div id="asp-2-bar" class="bg-tealsoft-500 h-full w-0 transition-all duration-500"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Mengukur mirror writing (3↔Ɛ), visual tracking, dan posisi kolom angka.</p>
+                        </div>
+
+                        <!-- Aspek 3 -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>3. Proses Kognitif Dalam Menulis</span>
+                                <span id="asp-3-score">0 / 16</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div id="asp-3-bar" class="bg-ambersoft-500 h-full w-0 transition-all duration-500"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Mengukur eksekusi ide ke kertas, transfer visual, dan urutan logis angka.</p>
+                        </div>
+
+                        <!-- Aspek 4 -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>4. Persepsi Diri & Pengalaman Subjek</span>
+                                <span id="asp-4-score">0 / 12</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div id="asp-4-bar" class="bg-rosesoft-500 h-full w-0 transition-all duration-500"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Mengukur preferensi lisan vs tulisan, kecenderungan menghindari penulisan angka.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lampiran Dokumen PDF Jawaban Siswa pada Rekap -->
+                <div id="res-lampiran-foto-container" class="hidden space-y-2 pt-2 border-t">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-paperclip text-soft-600"></i>
+                        <span>Dokumentasi File PDF Lembar Jawaban Siswa</span>
+                    </h3>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-file-pdf text-xl"></i>
+                            </div>
+                            <div class="truncate">
+                                <p id="res-pdf-name" class="text-xs font-bold text-slate-800 truncate">lembar_jawaban.pdf</p>
+                                <p id="res-pdf-size" class="text-[10px] text-slate-500">Status: Dokumen PDF Terlampir</p>
+                            </div>
+                        </div>
+                        <button onclick="viewUploadedPdf()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium rounded-lg transition shadow-sm flex items-center space-x-1.5 no-print flex-shrink-0">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>Buka PDF</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recommendations / Intervensi Paper Graph & Congratulations -->
+                <div id="res-rekomendasi-box" class="p-6 rounded-2xl bg-gradient-to-br from-soft-50 to-indigo-50 border border-soft-200 space-y-3">
+                    <h3 class="font-bold text-soft-800 text-sm flex items-center space-x-2" id="res-rekomendasi-title">
+                        <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                        <span>Rekomendasi Tindak Lanjut & Catatan</span>
+                    </h3>
+                    <div id="res-rekomendasi-text" class="text-xs text-slate-700 leading-relaxed space-y-2">
+                        <!-- Dynamic Recommendation Text -->
+                    </div>
+                </div>
+
+                <!-- Footer Signatures -->
+                <div class="grid grid-cols-2 gap-8 pt-8 border-t text-xs text-center text-slate-600">
+                    <div>
+                        <p class="mb-12">Mengetahui,<br><strong>Pengamat / Evaluator</strong></p>
+                        <p class="font-bold underline text-slate-800" id="sign-pengamat">(........................................)</p>
+                    </div>
+                    <div>
+                        <p class="mb-12">Tanggal Diterbitkan:<br><strong id="sign-tanggal">...</strong></p>
+                        <p class="font-bold underline text-slate-800" id="sign-nama-siswa">(........................................)</p>
+                        <p class="text-[10px] text-slate-400">Nama Siswa</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 no-print">
+        <p>Platform Deteksi Dini Disgrafia Matematika &copy; 2026. Dikembangkan berdasarkan Teori Psikologi Pendidikan (Berninger & Wolf, Smith, Cleveland Clinic).</p>
+    </footer>
+
+    <script>
+        // Global Application State
+        const state = {
+            student: {
+                nama: '',
+                jenjang: '',
+                kelas: '',
+                jk: '',
+                tanggal: new Date().toISOString().split('T')[0],
+                pengamat: ''
+            },
+            observations: Array(15).fill(null), // Stores scores 1-4
+            notes: Array(15).fill(''),
+            answerPdf: null // Stores { name: string, size: string, dataUrl: string }
+        };
+
+        // UI Toast Notification helper (replaces browser alerts)
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transition-all transform duration-300 translate-y-2 opacity-0 text-white ${
+                type === 'error' ? 'bg-rose-600' :
+                type === 'warning' ? 'bg-amber-600' :
+                type === 'success' ? 'bg-emerald-600' : 'bg-soft-600'
+            }`;
+
+            const icon = type === 'error' ? 'fa-circle-xmark' :
+                         type === 'warning' ? 'fa-triangle-exclamation' :
+                         type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Data 15 Items Observasi from document
+        const itemsObservasi = [
+            {
+                no: 1,
+                aspek: 1, // Motorik Halus
+                pernyataan: "Siswa tampak kesulitan menulis angka dengan ukuran seragam.",
+                indikator: "Koordinasi otot tangan belum stabil.",
+                kriteria: "Seragam artinya tinggi & lebar angka relatif sama. Ketidakseragaman terlihat jika perbedaan ukuran > 50% antar angka dalam satu baris."
+            },
+            {
+                no: 2,
+                aspek: 1,
+                pernyataan: "Tulisan angka siswa terlihat tidak rapi meskipun berulang kali mencoba.",
+                indikator: "Kesulitan mengontrol gerakan motorik.",
+                kriteria: "Rapi berarti angka tegak lurus, tidak keluar garis, dan bentuk jelas. Tidak rapi jika condong, bergelombang, atau goresan berulang-ulang."
+            },
+            {
+                no: 3,
+                aspek: 1,
+                pernyataan: "Siswa tampak cepat lelah ketika menyalin soal matematika.",
+                indikator: "Motorik halus lemah → kelelahan.",
+                kriteria: "Ditandai dengan sering berhenti, mengeluh pegal, menggerak-gerakkan tangan, atau waktu menyalin jauh lebih lama dari teman sebaya."
+            },
+            {
+                no: 4,
+                aspek: 1,
+                pernyataan: "Siswa kesulitan menjaga jarak antar angka konsisten.",
+                indikator: "Gangguan pengaturan spasial.",
+                kriteria: "Konsisten artinya jarak antar angka ± sama. Tidak konsisten bila angka menempel atau terlalu renggang (> 2 spasi normal)."
+            },
+            {
+                no: 5,
+                aspek: 2, // Orientasi Spasial
+                pernyataan: "Siswa sering menulis angka terbalik (mirror writing).",
+                indikator: "Lemah persepsi arah & orientasi.",
+                kriteria: "Misal angka 3 → Ɛ, 7 → ㄥ, atau 6 ↔ 9. Dicatat bila terjadi lebih dari 2 kali dalam 1 lembar kerja."
+            },
+            {
+                no: 6,
+                aspek: 2,
+                pernyataan: "Siswa tampak kesulitan menyalin soal dari papan tulis ke buku.",
+                indikator: "Gangguan visual tracking.",
+                kriteria: "Ditandai dengan sering melihat ulang papan > 3 kali untuk satu baris, kehilangan posisi, atau lompat baris saat menyalin."
+            },
+            {
+                no: 7,
+                aspek: 2,
+                pernyataan: "Siswa tampak bingung membedakan angka mirip bentuk.",
+                indikator: "Persepsi bentuk angka kabur.",
+                kriteria: "Misalnya sering salah menulis 6 jadi 9, atau 1 jadi 7. Kesalahan terlihat saat siswa mengulang/bertanya angka yang sama."
+            },
+            {
+                no: 8,
+                aspek: 2,
+                pernyataan: "Siswa sering menempatkan angka/tanda operasi tidak pada tempatnya.",
+                indikator: "Kesalahan posisi simbol dalam ruang.",
+                kriteria: "Misalnya tanda '+' terlalu jauh dari angka, angka tidak sejajar antar kolom nilai tempat (satuan, puluhan). Memengaruhi hasil hitung."
+            },
+            {
+                no: 9,
+                aspek: 3, // Proses Kognitif
+                pernyataan: "Siswa tahu jawaban, tetapi langkah perhitungannya sulit dibaca.",
+                indikator: "Gangguan eksekusi tulisan dari ide.",
+                kriteria: "Ditandai dengan coretan tidak jelas, angka tumpang tindih, atau langkah pengerjaan hilang."
+            },
+            {
+                no: 10,
+                aspek: 3,
+                pernyataan: "Siswa sering salah menyalin angka dari soal ke jawaban.",
+                indikator: "Transfer visual → tulisan terganggu.",
+                kriteria: "Misalnya soal 456 ditulis 465. Dicatat bila kesalahan terjadi lebih dari sekali pada soal berbeda."
+            },
+            {
+                no: 11,
+                aspek: 3,
+                pernyataan: "Siswa kesulitan menyelesaikan soal dengan banyak angka.",
+                indikator: "Beban kognitif + motorik tinggi.",
+                kriteria: "Ditandai dengan pengerjaan makin lambat saat soal panjang, banyak coretan/ulang tulis, atau berhenti sebelum selesai."
+            },
+            {
+                no: 12,
+                aspek: 3,
+                pernyataan: "Siswa sering salah menulis urutan angka.",
+                indikator: "Memori kerja & urutan logis terganggu.",
+                kriteria: "Misalnya 123 ditulis 132. Kesalahan konsisten merupakan indikator kuat disgrafia."
+            },
+            {
+                no: 13,
+                aspek: 4, // Persepsi Diri
+                pernyataan: "Siswa tampak lebih sulit menulis angka dibanding huruf.",
+                indikator: "Persepsi negatif pada angka.",
+                kriteria: "Terlihat dari keluhan 'lebih susah angka' atau pengerjaan angka lebih lambat/lebih banyak salah dibanding huruf."
+            },
+            {
+                no: 14,
+                aspek: 4,
+                pernyataan: "Siswa lebih suka menjawab soal lisan daripada menulis.",
+                indikator: "Strategi menghindari penulisan.",
+                kriteria: "Saat diberi pilihan, anak cenderung menyebutkan hasil secara lisan, bukan menulis di kertas."
+            },
+            {
+                no: 15,
+                aspek: 4,
+                pernyataan: "Tulisan angka siswa sering sulit dibaca saat mengerjakan soal.",
+                indikator: "Angka tidak terbaca jelas.",
+                kriteria: "Banyak angka yang bentuknya tidak konsisten, goresan tumpang tindih, atau sulit dikenali sehingga memengaruhi keterbacaan jawaban."
+            }
+        ];
+
+        // Initialize App on DOM Loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('input-tanggal');
+            if (dateInput) dateInput.valueAsDate = new Date();
+            renderObservationTable();
+        });
+
+        // Navigation Handler
+        function goToStep(stepName) {
+            const steps = ['login', 'soal', 'petunjuk', 'observasi', 'hasil'];
+            steps.forEach(s => {
+                const el = document.getElementById(`step-${s}`);
+                if (el) el.classList.add('hidden');
+
+                const navBtn = document.getElementById(`nav-${s}`);
+                if (navBtn) {
+                    navBtn.classList.remove('bg-soft-100', 'text-soft-700', 'font-bold');
+                }
+            });
+
+            const activeEl = document.getElementById(`step-${stepName}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${stepName}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-soft-100', 'text-soft-700', 'font-bold');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function checkAndGo(stepName) {
+            if (!state.student.nama && stepName !== 'login') {
+                showToast("Silakan isi data identitas siswa terlebih dahulu.", "warning");
+                goToStep('login');
+                return;
+            }
+            goToStep(stepName);
+        }
+
+        // Handle Login Submission
+        function handleLogin(e) {
+            e.preventDefault();
+            state.student.nama = document.getElementById('input-nama').value.trim();
+            state.student.jenjang = document.getElementById('input-jenjang').value;
+            state.student.kelas = document.getElementById('input-kelas').value.trim();
+            state.student.jk = document.getElementById('input-jk').value;
+            state.student.tanggal = document.getElementById('input-tanggal').value;
+            state.student.pengamat = document.getElementById('input-pengamat').value.trim() || 'Pengamat / Guru';
+
+            // Update UI Badges
+            document.getElementById('badge-nama').innerText = state.student.nama;
+            document.getElementById('badge-kelas').innerText = `${state.student.jenjang} - ${state.student.kelas}`;
+            document.getElementById('user-badge').classList.remove('hidden');
+            document.getElementById('user-badge').classList.add('flex');
+            document.getElementById('nav-steps').classList.remove('hidden');
+
+            // Sync print view
+            document.querySelectorAll('.print-nama').forEach(el => el.innerText = state.student.nama);
+            document.querySelectorAll('.print-kelas').forEach(el => el.innerText = `${state.student.jenjang} (${state.student.kelas})`);
+            document.querySelectorAll('.print-jk').forEach(el => el.innerText = state.student.jk);
+            document.querySelectorAll('.print-tanggal').forEach(el => el.innerText = state.student.tanggal);
+
+            showToast(`Data siswa ${state.student.nama} berhasil disimpan.`, 'success');
+            goToStep('soal');
+        }
+
+        // Upload & Preview File PDF Jawaban Handler
+        function handlePdfUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                showToast('Format file tidak sesuai. Harap unggah file dokumen berformat PDF (.pdf).', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            // File size limit check (Max 15MB)
+            if (file.size > 15 * 1024 * 1024) {
+                showToast('Ukuran file PDF terlalu besar. Maksimal ukuran file adalah 15MB.', 'warning');
+                e.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                const formattedSize = sizeInMB > 0.9 ? `${sizeInMB} MB` : `${Math.round(file.size / 1024)} KB`;
+
+                state.answerPdf = {
+                    name: file.name,
+                    size: formattedSize,
+                    dataUrl: evt.target.result
+                };
+
+                // Update UI PDF Preview Box
+                document.getElementById('pdf-file-name').innerText = file.name;
+                document.getElementById('pdf-file-size').innerText = formattedSize;
+                document.getElementById('container-preview-pdf').classList.remove('hidden');
+                document.getElementById('btn-remove-pdf').classList.remove('hidden');
+
+                showToast(`File PDF "${file.name}" berhasil diunggah!`, 'success');
+            };
+
+            reader.onerror = function() {
+                showToast('Terjadi kesalahan saat membaca file PDF. Silakan coba lagi.', 'error');
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function removePdfUpload() {
+            state.answerPdf = null;
+            document.getElementById('input-pdf-jawaban').value = '';
+            document.getElementById('container-preview-pdf').classList.add('hidden');
+            document.getElementById('btn-remove-pdf').classList.add('hidden');
+            showToast('Lampiran PDF berhasil dihapus.', 'info');
+        }
+
+        function viewUploadedPdf() {
+            if (!state.answerPdf || !state.answerPdf.dataUrl) {
+                showToast('Belum ada file PDF yang diunggah.', 'warning');
+                return;
+            }
+
+            const win = window.open();
+            if (win) {
+                win.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${state.answerPdf.name}</title>
+                        <style>
+                            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #333; }
+                            embed { width: 100%; height: 100%; border: none; }
+                        </style>
+                    </head>
+                    <body>
+                        <embed src="${state.answerPdf.dataUrl}" type="application/pdf" />
+                    </body>
+                    </html>
+                `);
+            } else {
+                showToast('Jendela pop-up diblokir browser. Izinkan pop-up untuk melihat PDF.', 'warning');
+            }
+        }
+
+        // Render Lembar Observasi Table
+        function renderObservationTable() {
+            const tbody = document.getElementById('obs-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            itemsObservasi.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition border-b";
+
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-bold text-slate-500">${item.no}</td>
+                    <td class="p-3 space-y-1">
+                        <div class="font-semibold text-slate-800 text-xs">${item.pernyataan}</div>
+                        <div class="text-[10px] text-soft-600 font-medium">Indikator: ${item.indikator}</div>
+                        <div class="text-[10px] text-slate-400 italic bg-slate-50 p-1.5 rounded border border-slate-100">${item.kriteria}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="radio" name="obs_${idx}" value="1" id="obs_${idx}_1" onchange="setScore(${idx}, 1)" class="w-4 h-4 text-soft-600 focus:ring-soft-500 cursor-pointer">
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="radio" name="obs_${idx}" value="2" id="obs_${idx}_2" onchange="setScore(${idx}, 2)" class="w-4 h-4 text-soft-600 focus:ring-soft-500 cursor-pointer">
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="radio" name="obs_${idx}" value="3" id="obs_${idx}_3" onchange="setScore(${idx}, 3)" class="w-4 h-4 text-soft-600 focus:ring-soft-500 cursor-pointer">
+                    </td>
+                    <td class="p-3 text-center">
+                        <input type="radio" name="obs_${idx}" value="4" id="obs_${idx}_4" onchange="setScore(${idx}, 4)" class="w-4 h-4 text-soft-600 focus:ring-soft-500 cursor-pointer">
+                    </td>
+                    <td class="p-3">
+                        <input type="text" placeholder="Catatan..." oninput="setNote(${idx}, this.value)" class="w-full px-2 py-1 text-[11px] soft-input bg-white">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setScore(idx, score) {
+            state.observations[idx] = score;
+            updateObsProgress();
+        }
+
+        function setNote(idx, text) {
+            state.notes[idx] = text;
+        }
+
+        function updateObsProgress() {
+            const filled = state.observations.filter(val => val !== null).length;
+            document.getElementById('obs-filled-count').innerText = filled;
+        }
+
+        // Process and Calculate Diagnosis
+        function processDiagnosis() {
+            const filledCount = state.observations.filter(v => v !== null).length;
+            if (filledCount < 15) {
+                showToast(`Catatan: ${filledCount} dari 15 item terisi. Item kosong dihitung dengan skor minimal (1).`, 'info');
+            }
+
+            // Fill empty scores with 1 by default if skipped
+            const scores = state.observations.map(v => v === null ? 1 : v);
+            const totalScore = scores.reduce((a, b) => a + b, 0);
+
+            // Aspect Breakdown
+            // Aspect 1: Items 1-4 (Motorik Halus)
+            const scoreAsp1 = scores[0] + scores[1] + scores[2] + scores[3]; // Max 16
+            // Aspect 2: Items 5-8 (Orientasi Spasial)
+            const scoreAsp2 = scores[4] + scores[5] + scores[6] + scores[7]; // Max 16
+            // Aspect 3: Items 9-12 (Proses Kognitif)
+            const scoreAsp3 = scores[8] + scores[9] + scores[10] + scores[11]; // Max 16
+            // Aspect 4: Items 13-15 (Persepsi Diri)
+            const scoreAsp4 = scores[12] + scores[13] + scores[14]; // Max 12
+
+            // Calculate Risk Categories according to document:
+            // 15-29 = Low (Rendah / Tidak ada indikasi / Sehat)
+            // 30-44 = Moderate (Sedang / Risiko)
+            // 45-60 = High (Tinggi / Indikasi Kuat)
+            let kategori = '';
+            let kategoriDesc = '';
+            let badgeClass = '';
+            let percentHambatan = Math.round(((totalScore - 15) / (60 - 15)) * 100);
+            if (percentHambatan < 0) percentHambatan = 0;
+
+            let rekomendasiHTML = '';
+            let boxTitleHTML = '';
+            let recoBoxClass = '';
+
+            if (totalScore <= 29) {
+                kategori = 'Kondisi Sehat (Risiko Rendah / Normal)';
+                kategoriDesc = 'Peserta didik menunjukkan kemampuan grafomotorik, visual-spasial, dan proses kognitif penulisan matematika yang sangat baik. Tidak ditemukan hambatan disgrafia matematika.';
+                badgeClass = 'bg-emerald-50 border-emerald-300 text-emerald-800';
+                recoBoxClass = 'p-6 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-3';
+                boxTitleHTML = `<i class="fa-solid fa-award text-emerald-600 text-base"></i><span class="text-emerald-900 font-bold">Selamat! Hasil Diagnosa Baik & Apresiasi</span>`;
+                
+                rekomendasiHTML = `
+                    <div class="p-3 bg-white/80 rounded-xl border border-emerald-200 text-emerald-900 font-medium mb-2">
+                        🎉 <strong>Selamat untuk Ananda ${state.student.nama}!</strong> Ananda memiliki koordinasi motorik halus dan pemahaman spasial penulisan angka yang sangat sehat dan rapi.
+                    </div>
+                    <p>• <strong>Pertahankan Pembelajaran Reguler:</strong> Tetap latih ketelitian pengerjaan soal matematika susun ke bawah dan pengerjaan soal cerita.</p>
+                    <p>• <strong>Apresiasi & Motivasi:</strong> Berikan pujian atas kerapian tulisan dan ketepatan posisi penulisan angka agar motivasi belajar matematika terus terjaga.</p>
+                `;
+            } else if (totalScore <= 44) {
+                kategori = 'Risiko Sedang (Tanda Awal Disgrafia Matematika)';
+                kategoriDesc = 'Terdapat beberapa tanda awal hambatan penulisan angka dan operasional matematika. Siswa tergolong berisiko dan membutuhkan bimbingan terarah serta pendampingan pola spasial.';
+                badgeClass = 'bg-amber-50 border-amber-300 text-amber-800';
+                recoBoxClass = 'p-6 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3';
+                boxTitleHTML = `<i class="fa-solid fa-hand-holding-medical text-amber-600 text-base"></i><span class="text-amber-900 font-bold">Instruksi Penanganan Lebih Lanjut & Panduan Pendampingan</span>`;
+
+                rekomendasiHTML = `
+                    <div class="p-3 bg-white/80 rounded-xl border border-amber-200 text-amber-900 font-medium mb-2">
+                        ⚠️ <strong>Perhatian:</strong> Ditemukan indikasi ringan hingga sedang hambatan grafomotorik matematika. Diperlukan penanganan dini agar tidak mengganggu prestasi belajar.
+                    </div>
+                    <p><strong>1. Latihan Bimbingan Spasial:</strong> Gunakan kertas bergaris bantu atau kertas kotak sedang untuk melatih kesejajaran posisi angka (satuan, puluhan, ratusan).</p>
+                    <p><strong>2. Manajemen Kelelahan Motorik:</strong> Berikan jeda istirahat (brain break) 2–3 menit saat pengerjaan soal matematika yang membutuhkan banyak proses menulis.</p>
+                    <p><strong>3. Koreksi Orientasi Angka:</strong> Berikan warna berbeda (penanda visual) pada angka yang sering terbalik ditulis (seperti 3, 6, 9) untuk membantu ingatan memori visual.</p>
+                    <p><strong>4. Saran Untuk Guru/Orang Tua:</strong> Hindari memberikan hukuman terkait tulisan kurang rapi; fokuslah pada apresiasi kebenaran konsep langkah matematika.</p>
+                `;
+            } else {
+                kategori = 'Risiko Tinggi (Indikasi Kuat Disgrafia Matematika)';
+                kategoriDesc = 'Menunjukkan gejala disgrafia matematika yang signifikan dan konsisten. Hambatan motorik halus, visual tracking, dan orientasi spasial sangat mengganggu ketepatan tulisan angka.';
+                badgeClass = 'bg-rose-50 border-rose-300 text-rose-800';
+                recoBoxClass = 'p-6 rounded-2xl bg-rose-50/80 border border-rose-200 space-y-3';
+                boxTitleHTML = `<i class="fa-solid fa-circle-exclamation text-rose-600 text-base"></i><span class="text-rose-900 font-bold">Instruksi Khusus Intervensi Intensif & Saran Profesional</span>`;
+
+                rekomendasiHTML = `
+                    <div class="p-3 bg-white/80 rounded-xl border border-rose-200 text-rose-900 font-medium mb-2">
+                        🚨 <strong>Rekomendasi Intervensi Khusus:</strong> Indikasi disgrafia matematika tergolong tinggi. Siswa memerlukan media bantu khusus serta konsultasi profesional penanganan disgrafia.
+                    </div>
+                    <p><strong>1. Wajib Penggunaan Media Paper Graph:</strong> Sangat disarankan menggunakan <em>Paper Graph (kertas kisi-kisi grid 0.5cm)</em> dilengkapi label kolom (Satuan, Puluhan, Ratusan) pada setiap tugas dan ujian matematika.</p>
+                    <p><strong>2. Akomodasi Asesmen Sekolah:</strong> Berikan tambahan waktu pengerjaan (<em>time extension</em> 25–50%) atau izinkan kombinasi jawaban lisan / penggunaan kalkulator untuk pengerjaan soal bertingkat.</p>
+                    <p><strong>3. Alat Tulis Ergonomis:</strong> Gunakan pensil pegangan khusus (<em>pencil grip ergonomis</em>) untuk mengurangi tekanan lelah berlebih pada jari tangan siswa.</p>
+                    <p><strong>4. Rekomendasi Konsultasi Lanjutan:</strong> Segera jadwalkan konsultasi evaluasi dengan <strong>Psikolog Pendidikan / Terapis Okupasi (Occupational Therapist)</strong> untuk program integrasi visoomotorik dan pematangan otot motorik halus.</p>
+                `;
+            }
+
+            // Fill Diagnosis Results into UI
+            document.getElementById('res-nama').innerText = state.student.nama;
+            document.getElementById('res-jenjang-kelas').innerText = `${state.student.jenjang} / ${state.student.kelas}`;
+            document.getElementById('res-jk').innerText = state.student.jk;
+            document.getElementById('res-tanggal').innerText = state.student.tanggal;
+            document.getElementById('res-pengamat').innerText = state.student.pengamat;
+            document.getElementById('res-score-number').innerText = `${totalScore} / 60`;
+            document.getElementById('res-percent').innerText = `${percentHambatan}%`;
+
+            const badgeBox = document.getElementById('res-badge-box');
+            badgeBox.className = `p-6 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-6 ${badgeClass}`;
+            document.getElementById('res-kategori-title').innerText = kategori;
+            document.getElementById('res-kategori-desc').innerText = kategoriDesc;
+
+            // Aspect Progress Bars & Values
+            document.getElementById('asp-1-score').innerText = `${scoreAsp1} / 16`;
+            document.getElementById('asp-1-bar').style.width = `${(scoreAsp1 / 16) * 100}%`;
+
+            document.getElementById('asp-2-score').innerText = `${scoreAsp2} / 16`;
+            document.getElementById('asp-2-bar').style.width = `${(scoreAsp2 / 16) * 100}%`;
+
+            document.getElementById('asp-3-score').innerText = `${scoreAsp3} / 16`;
+            document.getElementById('asp-3-bar').style.width = `${(scoreAsp3 / 16) * 100}%`;
+
+            document.getElementById('asp-4-score').innerText = `${scoreAsp4} / 12`;
+            document.getElementById('asp-4-bar').style.width = `${(scoreAsp4 / 12) * 100}%`;
+
+            // Update Rekomendasi Box
+            const recoBox = document.getElementById('res-rekomendasi-box');
+            recoBox.className = recoBoxClass;
+            document.getElementById('res-rekomendasi-title').innerHTML = boxTitleHTML;
+            document.getElementById('res-rekomendasi-text').innerHTML = rekomendasiHTML;
+
+            // Sync Lampiran PDF Jawaban Siswa
+            const lampiranContainer = document.getElementById('res-lampiran-foto-container');
+            if (state.answerPdf) {
+                document.getElementById('res-pdf-name').innerText = state.answerPdf.name;
+                document.getElementById('res-pdf-size').innerText = `Ukuran: ${state.answerPdf.size} | Terlampir`;
+                lampiranContainer.classList.remove('hidden');
+            } else {
+                lampiranContainer.classList.add('hidden');
+            }
+
+            document.getElementById('sign-pengamat').innerText = state.student.pengamat;
+            document.getElementById('sign-nama-siswa').innerText = state.student.nama;
+            document.getElementById('sign-tanggal').innerText = state.student.tanggal;
+
+            goToStep('hasil');
+            showToast('Hasil diagnosa disgrafia berhasil diperhitungkan.', 'success');
+        }
+
+        // Export Functionality: Download Sheet / Summary
+        function downloadSoalPDF() {
+            window.print();
+        }
+
+        function downloadAsImage() {
+            const cardElement = document.getElementById('rekap-card-export');
+            if (!cardElement) return;
+
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Membuat Gambar...</span>`;
+            btn.disabled = true;
+
+            html2canvas(cardElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const imageURI = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                const safeName = (state.student.nama || 'Siswa').replace(/\s+/g, '_');
+                link.download = `Hasil_Diagnosa_Disgrafia_${safeName}.png`;
+                link.href = imageURI;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showToast("Hasil rekapitulasi berhasil diunduh dalam format gambar PNG.", "success");
+            }).catch(err => {
+                console.error(err);
+                showToast("Gagal mengunduh gambar. Silakan coba tombol Cetak Laporan.", "error");
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
